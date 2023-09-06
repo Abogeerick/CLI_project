@@ -1,22 +1,29 @@
+#!/usr/bin/env python3
+
 from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey, Date
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
 Base = declarative_base()
-engine = create_engine('sqlite:///inventory.db')
+engine = create_engine('sqlite:///products.db')
 
 class Category(Base):
     __tablename__ = 'categories'
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
-    # Add any additional fields as needed
+    
+    # Define the relationship with products
+    products = relationship('Product', back_populates='category')
 
 class Supplier(Base):
     __tablename__ = 'suppliers'
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
     contact_info = Column(String)
-    # Add any additional fields as needed
+    
+    # Define the relationship with products
+    products = relationship('Product', back_populates='supplier')
 
 class Product(Base):
     __tablename__ = 'products'
@@ -26,9 +33,14 @@ class Product(Base):
     quantity = Column(Integer, default=0)
     price = Column(Float)
     supplier_id = Column(Integer, ForeignKey('suppliers.id'))
-    supplier = relationship('Supplier', back_populates='products')  # Define the relationship
+    
+    # Define the relationship with supplier
+    supplier = relationship('Supplier', back_populates='products')
+    
     category_id = Column(Integer, ForeignKey('categories.id'))
-    category = relationship('Category', back_populates='products')  # Define the relationship
+    
+    # Define the relationship with category
+    category = relationship('Category', back_populates='products')
 
 class Transaction(Base):
     __tablename__ = 'transactions'
@@ -38,6 +50,3 @@ class Transaction(Base):
     quantity_changed = Column(Integer)
     transaction_date = Column(Date)
     notes = Column(String)
-    # Add any additional fields as needed
-
-Base.metadata.create_all(engine)
