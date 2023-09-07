@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+# models.py
 
 from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey, Date
 from sqlalchemy.orm import relationship
