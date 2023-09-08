@@ -26,7 +26,7 @@ This is an interactive Command-Line Interface (CLI) application for managing an 
 
 1. Clone the repository to your local machine:
 ```bash 
-        git clone 
+        git clone https://github.com/Abogeerick/CLI_project
 ```
 2. Navigate to the project directory:
 ```bash 
