@@ -2,6 +2,7 @@ import random
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from models import Product, Category, Supplier, Transaction
+from faker import Faker
 
 # Define your SQLite database URL here
 DATABASE_URL = "sqlite:///products.db"
@@ -13,27 +14,51 @@ engine = create_engine(DATABASE_URL)
 Session = sessionmaker(bind=engine)
 session = Session()
 
-# List of sample product names and descriptions
-product_names = ["Product A", "Product B", "Product C", "Product D", "Product E"]
-descriptions = ["Description 1", "Description 2", "Description 3", "Description 4", "Description 5"]
+# Initialize Faker
+fake = Faker()
 
-# List of sample categories
-categories = ["Category 1", "Category 2", "Category 3"]
+# Define the database models (ensure they are defined in the 'models.py' file)
+from models import Product, Category, Supplier, Transaction
 
-# List of sample suppliers
-suppliers = ["Supplier 1", "Supplier 2", "Supplier 3"]
+# Clear existing data from tables
+session.query(Category).delete()
+session.query(Supplier).delete()
+session.query(Product).delete()
+session.query(Transaction).delete()
+session.commit()
 
-# Seed the 'products' table with random data
+# Generate data for categories table
+for _ in range(50):
+    category = Category(name=fake.word())
+    session.add(category)
+
+# Generate data for suppliers table
+for _ in range(50):
+    supplier = Supplier(name=fake.company(), contact_info=fake.email())
+    session.add(supplier)
+
+# Generate data for products table
 for _ in range(50):
     product = Product(
-        name=random.choice(product_names),
-        description=random.choice(descriptions),
-        quantity=random.randint(0, 100),  # Random quantity between 0 and 100
-        price=round(random.uniform(10.0, 100.0), 2),  # Random price between 10.0 and 100.0 with 2 decimal places
-        category=Category(name=random.choice(categories)),
-        supplier=Supplier(name=random.choice(suppliers))
+        name=fake.catch_phrase(),
+        description=fake.paragraph(),
+        quantity=random.randint(1, 100),
+        price=round(random.uniform(10.0, 500.0), 2),
+        supplier_id=random.randint(1, 50),  # Assuming you have 50 suppliers
+        category_id=random.randint(1, 50)   # Assuming you have 50 categories
     )
     session.add(product)
+
+# Generate data for transactions table
+for _ in range(50):
+    transaction = Transaction(
+        product_id=random.randint(1, 50),        # Assuming you have 50 products
+        transaction_type=random.choice(["Purchase", "Sale"]),
+        quantity_changed=random.randint(1, 50),
+        transaction_date=fake.date_this_decade(),
+        notes=fake.sentence()
+    )
+    session.add(transaction)
 
 # Commit the changes to the database
 session.commit()
